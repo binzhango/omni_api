@@ -95,6 +95,33 @@ For new platform engineers, follow this order:
 3. Read spec files under `openspec/changes/phase-1/specs/` relevant to your route or provider.
 4. Align implementation tasks with the diagnostics and canonical transform contracts before adding new adapters.
 
+## Python MVP Usage
+
+```python
+from omni_api import transform
+
+source_payload = {
+    "full_name": "John Doe",
+    "age": 30,
+    "contact": {"email": "john@example.com"},
+    "extra_data": "ignored",
+}
+
+target_schema = {
+    "type": "object",
+    "properties": {
+        "name": {"type": "string"},
+        "age": {"type": "number"},
+        "email": {"type": "string"},
+    },
+    "required": ["name", "age", "email"],
+}
+
+result = transform(source_payload, target_schema)
+print(result.payload)
+# {'name': 'John Doe', 'age': 30, 'email': 'john@example.com'}
+```
+
 ## Scope and Non-Goals
 
 Current scope:
