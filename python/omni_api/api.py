@@ -2,8 +2,9 @@ from typing import Any
 
 from .errors import TransformSchemaError
 from .executor import apply_plan
-from .plan_types import TransformResult
+from .plan_types import TransformReport, TransformResult
 from .planner import build_plan
+from .validator import validate_payload
 
 
 REQUIRED_SCHEMA_KEYS = {"type", "properties", "required"}
@@ -26,4 +27,12 @@ def transform(source_payload: dict[str, Any], target_schema: dict[str, Any]) -> 
     _validate_schema_subset(target_schema)
     plan = build_plan(source_payload, target_schema)
     payload, report = apply_plan(source_payload, target_schema, plan)
-    return TransformResult(payload=payload, plan=plan, report=report)
+    missing_required = validate_payload(payload, target_schema, plan.required)
+
+    final_report = TransformReport(
+        mapped=report.mapped,
+        dropped=report.dropped,
+        missing_required=missing_required,
+        warnings=report.warnings,
+    )
+    return TransformResult(payload=payload, plan=plan, report=final_report)
