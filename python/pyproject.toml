@@ -2,9 +2,9 @@
 name = "omni-api"
 version = "0.1.0"
 description = "Deterministic payload transformer MVP"
-readme = "../README.md"
+readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "MIT" }
+license = "MIT"
 authors = [
   { name = "Bin Zhang" },
 ]
@@ -12,7 +12,6 @@ keywords = ["payload", "transform", "schema", "adapter", "api"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.11",
