@@ -1,0 +1,10 @@
+[project]
+name = "omni-api-python"
+version = "0.1.0"
+description = "Thin Python wrapper for omni_api Rust core"
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
