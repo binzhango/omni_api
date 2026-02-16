@@ -1,4 +1,6 @@
-from omni_api import to_ollama_payload
+import pytest
+
+from omni_api import TransformValidationError, to_ollama_payload
 
 
 def test_adapter_symbol_is_exported() -> None:
@@ -35,3 +37,13 @@ def test_chat_takes_precedence_when_both_present() -> None:
     )
     assert "messages" in result
     assert "prompt" not in result
+
+
+def test_missing_model_raises_validation_error() -> None:
+    with pytest.raises(TransformValidationError):
+        to_ollama_payload({"messages": [{"role": "user", "content": "x"}]})
+
+
+def test_missing_messages_and_prompt_raises_validation_error() -> None:
+    with pytest.raises(TransformValidationError):
+        to_ollama_payload({"model": "llama3"})
