@@ -1,5 +1,3 @@
-from typing import Any
+from .ollama import to_ollama_payload
 
-
-def to_ollama_payload(source_payload: dict[str, Any]) -> dict[str, Any]:
-    return source_payload
+__all__ = ["to_ollama_payload"]
