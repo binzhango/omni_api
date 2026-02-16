@@ -205,3 +205,13 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+openspec/changes/archive/2026-02-14-chat-canonical-routing/.openspec.yaml
+openspec/changes/archive/2026-02-14-chat-canonical-routing/design.md
+openspec/changes/archive/2026-02-14-chat-canonical-routing/proposal.md
+openspec/changes/archive/2026-02-14-chat-canonical-routing/tasks.md
+openspec/changes/archive/2026-02-14-chat-canonical-routing/specs/adapter-diagnostics-contract/spec.md
+openspec/changes/archive/2026-02-14-chat-canonical-routing/specs/chat-canonical-transform/spec.md
+openspec/changes/archive/2026-02-14-chat-canonical-routing/specs/provider-availability-routing/spec.md
+openspec/specs/adapter-diagnostics-contract/spec.md
+openspec/specs/chat-canonical-transform/spec.md
+openspec/specs/provider-availability-routing/spec.md
