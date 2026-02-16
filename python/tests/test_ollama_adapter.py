@@ -18,3 +18,20 @@ def test_chat_payload_passthrough_messages() -> None:
     assert result["messages"] == [{"role": "user", "content": "hello"}]
     assert result["stream"] is False
     assert "extra" not in result
+
+
+def test_generate_payload_passthrough_prompt() -> None:
+    result = to_ollama_payload({"model": "llama3", "prompt": "hello", "extra": "drop-me"})
+    assert result == {"model": "llama3", "prompt": "hello"}
+
+
+def test_chat_takes_precedence_when_both_present() -> None:
+    result = to_ollama_payload(
+        {
+            "model": "llama3",
+            "messages": [{"role": "user", "content": "chat"}],
+            "prompt": "ignored prompt",
+        }
+    )
+    assert "messages" in result
+    assert "prompt" not in result

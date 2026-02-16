@@ -16,4 +16,14 @@ def to_ollama_payload(source_payload: dict[str, Any]) -> dict[str, Any]:
                 payload[key] = source_payload[key]
         return payload
 
-    return dict(source_payload)
+    if "prompt" in source_payload:
+        payload = {
+            "model": source_payload.get("model"),
+            "prompt": source_payload["prompt"],
+        }
+        for key in PASSTHROUGH_KEYS:
+            if key in source_payload:
+                payload[key] = source_payload[key]
+        return payload
+
+    return {"model": source_payload.get("model")}
