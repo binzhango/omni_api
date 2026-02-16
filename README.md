@@ -2,39 +2,37 @@
 
 `omni_api` is a payload adaptation layer for platform teams that need to enforce backend API contracts while supporting heterogeneous upstream producers.
 
-Upstream systems emit varied payload shapes, while backend services require strict and stable contracts. `omni_api` centralizes payload normalization so contract enforcement does not sprawl across services.
+Upstream systems rarely emit a single stable shape. Backend services require strict contracts for correctness and long-term maintainability. Without a shared adaptation layer, transform logic fragments across services and drifts over time.
 
 ## Opening and Positioning
 
-`omni_api` is intended for platform/backend teams responsible for shared API boundaries.
+`omni_api` is designed for platform/backend teams that own shared API boundaries.
 
 It provides:
-- Centralized transformation logic
-- Deterministic and auditable behavior
+- Centralized transformation logic instead of per-service adapters
+- Deterministic and auditable mapping behavior
 - Isolation between producer payloads and backend contracts
-- Faster onboarding for new integrations
+- Faster integration onboarding
 
 ## Core Architecture Model
 
 `omni_api` follows a deterministic two-step model:
 1. Compile a Transform Plan from source payload and target contract.
-2. Execute the plan with a pure deterministic transformer.
-
-This separation improves replayability, testability, and root-cause debugging.
+2. Execute the plan with a pure transformer.
 
 Core components:
-- Router: selects the target backend route/profile
+- Router: selects target backend profile and route
 - Schema Loader: resolves canonical contract
-- Planner: creates Transform Plan output (heuristic-first)
-- Executor: applies plan instructions
-- Validator: checks contract conformance and required fields
-- Diagnostics: emits structured transformation evidence
+- Planner: generates Transform Plan output
+- Executor: applies `mappings`, `defaults`, and `drops`
+- Validator: enforces required fields and contract validity
+- Diagnostics: reports what changed and why
 
 ## Contracts and Canonical Artifacts
 
 Backend contracts are the source of truth and should be maintained as JSON Schema files under `schemas/<provider>/<endpoint>.json`.
 
-The Transform Plan DSL is versioned and includes:
+Transform Plan DSL fields:
 - `mappings`
 - `defaults`
 - `drops`
@@ -42,14 +40,8 @@ The Transform Plan DSL is versioned and includes:
 
 Execution guarantees:
 - Output keys stay within target JSON Schema unless policy allows passthrough
-- Missing source paths are captured in diagnostics
-- Required fields are enforced before backend dispatch
-
-Diagnostics contract includes:
-- mapped fields
-- dropped fields
-- missing required fields
-- warnings and confidence
+- Missing source paths emit diagnostics
+- Required fields are validated before backend dispatch
 
 Policy controls:
 - strict mode
@@ -58,21 +50,44 @@ Policy controls:
 
 ## Runtime Behavior and Operational Expectations
 
-- Runtime flow: ingress -> routing -> planning -> execution -> validation -> diagnostics.
-- Failure handling and observability expectations are defined with the specs.
+The request lifecycle is:
+ingress payload -> route selection -> plan generation -> deterministic execution -> validation -> diagnostics emission.
+
+Failure handling:
+- validation failure is returned as a structured response
+- strict mode prevents silent field loss
+- warnings surface uncertain mappings
+
+Operational observability:
+- log plan version and selected profile
+- emit mapped/dropped/missing counters per request
+- track validation and policy failures as metrics
 
 ## Repository Map
 
+Primary references:
 - `openspec/changes/phase-1/design.md`
-- `openspec/changes/phase-1/specs/`
+- `openspec/changes/phase-1/specs/chat-canonical-transform/spec.md`
+- `openspec/changes/phase-1/specs/provider-availability-routing/spec.md`
+- `openspec/changes/phase-1/specs/adapter-diagnostics-contract/spec.md`
+- `openspec/changes/phase-1/specs/chat-openai-vertical-slice/spec.md`
 
 ## First-Read Onboarding Path
 
-1. Read `README.md`.
-2. Read `openspec/changes/phase-1/design.md`.
-3. Read relevant specs under `openspec/changes/phase-1/specs/`.
+1. Read `README.md` for system boundaries.
+2. Read `openspec/changes/phase-1/design.md` for phase intent.
+3. Read relevant files in `openspec/changes/phase-1/specs/`.
+4. Align new adapter work with canonical transform and diagnostics contracts.
 
 ## Scope and Non-Goals
 
-- Scope: deterministic payload transformation into backend contracts.
-- Non-goals: replacing backend business validation and policy.
+Current scope:
+- deterministic payload transformation to target contracts
+- explicit diagnostics and policy boundaries
+
+This section states explicit non-goals to prevent scope drift.
+
+Non-goals:
+- replacing backend business validation rules
+- defining provider SDK behavior outside contract transformation
+- allowing implicit schema drift through silent passthrough defaults
