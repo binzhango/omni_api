@@ -1,101 +1,24 @@
 # omni_api
 
+[![CI](https://github.com/binzhango/omni_api/actions/workflows/ci-publish.yml/badge.svg?branch=main)](https://github.com/binzhango/omni_api/actions/workflows/ci-publish.yml)
+[![PyPI version](https://img.shields.io/pypi/v/omni-api.svg)](https://pypi.org/project/omni-api/)
+[![Python versions](https://img.shields.io/pypi/pyversions/omni-api.svg)](https://pypi.org/project/omni-api/)
+
 `omni_api` is a payload adaptation layer for platform teams that need to enforce backend API contracts while supporting heterogeneous upstream producers.
 
-Upstream systems rarely emit a single stable shape. Backend services, however, depend on strict contracts for correctness, validation, and long-term maintainability. Without a shared adaptation layer, transformation logic fragments across services and drifts over time. `omni_api` centralizes that responsibility so backend contracts remain stable and producer variation stays isolated.
+## Install
 
-## Opening and Positioning
+```bash
+pip install omni-api
+```
 
-`omni_api` is designed for platform and backend teams that own shared API boundaries.
+Optional with uv:
 
-It provides:
-- Centralized transformation logic instead of per-service adapter code
-- Deterministic and auditable mapping behavior
-- Isolation between producer payloads and backend contracts
-- Faster integration onboarding across providers and internal clients
+```bash
+uv add omni-api
+```
 
-## Core Architecture Model
-
-`omni_api` follows a deterministic two-step model:
-1. Compile a Transform Plan from source payload plus target contract.
-2. Execute that plan with a pure transformation step.
-
-This separates planning from execution and avoids opaque "guess and mutate" behavior at runtime. The result is easier debugging, consistent replayability, and straightforward test coverage of transformation decisions.
-
-Core components:
-- Router: selects the target backend profile and route
-- Schema Loader: loads the canonical backend contract
-- Planner: generates a Transform Plan (heuristic-first, optional assisted planning for unresolved mappings)
-- Executor: applies `mappings`, `defaults`, and `drops`
-- Validator: enforces required fields and contract validity
-- Diagnostics: emits a structured report of what changed
-
-Each request returns both transformed payload output and diagnostics metadata.
-
-## Contracts and Canonical Artifacts
-
-Backend contracts are the source of truth and should be maintained as JSON Schema files under `schemas/<provider>/<endpoint>.json`.
-
-The Transform Plan is a versioned DSL that includes:
-- `mappings`: source-path to target-field copies or transformations
-- `defaults`: fallback values for absent optional fields
-- `drops`: explicit removals or exclusion rules
-- `required`: fields that must exist before backend dispatch
-
-Execution guarantees:
-- Output keys are constrained to the target JSON Schema unless policy explicitly allows passthrough
-- Invalid or missing source paths are captured in diagnostics
-- Required fields are validated before backend calls
-
-Diagnostics contract:
-- Mapped fields
-- Dropped fields
-- Missing required fields
-- Confidence/warning signals for uncertain mappings
-
-Policy controls:
-- strict mode behavior
-- unknown-field handling
-- fallback strategy selection
-
-## Runtime Behavior and Operational Expectations
-
-The request lifecycle is:
-ingress payload -> route selection -> plan generation -> deterministic execution -> validation -> diagnostics emission.
-
-Planner strategy:
-- Heuristic mapping first (exact key, alias, and type-aware matches)
-- Assisted planning only for unresolved cases
-- Confidence-based handling for acceptance versus manual review
-
-Failure and safety expectations:
-- validation failure is returned as a structured response, not a silent mutation
-- strict mode prevents silent field loss
-- warnings surface low-confidence mappings for operator visibility
-
-Operational observability:
-- Log plan version and selected route profile
-- Emit mapped/dropped/missing counters per request
-- Track validation and policy failures as first-class metrics
-
-## Repository Map
-
-Primary references in this repository:
-- `openspec/changes/phase-1/design.md`: phase architecture baseline
-- `openspec/changes/phase-1/specs/chat-canonical-transform/spec.md`: canonical transform behavior
-- `openspec/changes/phase-1/specs/provider-availability-routing/spec.md`: routing expectations
-- `openspec/changes/phase-1/specs/adapter-diagnostics-contract/spec.md`: diagnostics schema and obligations
-- `openspec/changes/phase-1/specs/chat-openai-vertical-slice/spec.md`: first vertical-slice constraints
-
-## First-Read Onboarding Path
-
-For new platform engineers, follow this order:
-1. Read this `README.md` for architecture and boundaries.
-2. Read `openspec/changes/phase-1/design.md` for phase-level design intent.
-3. Read spec files under `openspec/changes/phase-1/specs/` relevant to your route or provider.
-4. Align implementation tasks with the diagnostics and canonical transform contracts before adding new adapters.
-
-## Python MVP Usage
+## Quickstart
 
 ```python
 from omni_api import transform
@@ -122,14 +45,81 @@ print(result.payload)
 # {'name': 'John Doe', 'age': 30, 'email': 'john@example.com'}
 ```
 
+## API
+
+### `transform(source_payload, target_schema)`
+
+Inputs:
+- `source_payload`: `dict[str, Any]`
+- `target_schema`: JSON Schema object subset (`type`, `properties`, `required`)
+
+Returns `TransformResult`:
+- `payload`: transformed payload restricted to target schema keys
+- `plan`: deterministic transform plan with mapping decisions
+- `report`: mapped/dropped/missing fields and warnings
+
+Raises:
+- `TransformSchemaError`: unsupported schema shape
+- `TransformValidationError`: missing required or invalid output payload
+
+## Core Architecture Model
+
+`omni_api` follows a deterministic two-step model:
+1. Compile a Transform Plan from source payload plus target contract.
+2. Execute that plan with a pure transformation step.
+
+Core components:
+- Router: selects target backend profile/route (future extension)
+- Schema Loader: loads canonical backend contract
+- Planner: generates deterministic mappings
+- Executor: applies `mappings`, `defaults`, and `drops`
+- Validator: enforces required fields and output constraints
+- Diagnostics: emits structured transformation report
+
+## Contracts and Canonical Artifacts
+
+- Backend contracts should be maintained as JSON Schema under `schemas/<provider>/<endpoint>.json`.
+- Transform Plan DSL includes `mappings`, `defaults`, `drops`, `required`.
+- Output keys are constrained to schema-defined keys in strict mode.
+
+## Development
+
+Run tests with `uv`:
+
+```bash
+cd python
+uv run pytest -q
+```
+
+Build package artifacts:
+
+```bash
+cd python
+uv run --with build python -m build
+```
+
+## Release
+
+Publishing is automated via GitHub Actions (`.github/workflows/ci-publish.yml`):
+- Push to `main` runs tests and then attempts PyPI publish
+- Publish uses GitHub secret `PYPI_API_TOKEN`
+- Bump `python/pyproject.toml` version before merge to `main` to avoid duplicate version failures
+
+## Repository Map
+
+Primary references in this repository:
+- `openspec/changes/phase-1/design.md`
+- `openspec/changes/phase-1/specs/chat-canonical-transform/spec.md`
+- `openspec/changes/phase-1/specs/provider-availability-routing/spec.md`
+- `openspec/changes/phase-1/specs/adapter-diagnostics-contract/spec.md`
+- `openspec/changes/phase-1/specs/chat-openai-vertical-slice/spec.md`
+
 ## Scope and Non-Goals
 
 Current scope:
 - Normalize producer payloads into provider/backend-specific contracts
 - Provide deterministic transform execution and diagnostics
 - Maintain explicit operational policy boundaries
-
-This section states explicit non-goals to prevent accidental scope expansion.
 
 Non-goals:
 - Replacing backend business logic validation rules
