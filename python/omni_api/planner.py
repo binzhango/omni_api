@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from .plan_types import Mapping, TransformPlan
@@ -7,6 +8,11 @@ from .plan_types import Mapping, TransformPlan
 
 def _normalize(value: str) -> str:
     return value.replace("_", "").lower()
+
+
+def _tokenize(value: str) -> list[str]:
+    tokens = re.split(r"[^a-zA-Z0-9]+", value.lower())
+    return [token for token in tokens if token]
 
 
 def _flatten_paths(payload: dict[str, Any], prefix: str = "") -> list[tuple[str, Any]]:
@@ -32,6 +38,17 @@ def _best_candidates(target_key: str, source_paths: list[str]) -> tuple[list[str
     ]
     if normalized_direct:
         return normalized_direct, []
+
+    target_tokens = set(_tokenize(target_key))
+    token_direct = []
+    for path in source_paths:
+        if "." in path:
+            continue
+        source_tokens = set(_tokenize(path))
+        if target_tokens and target_tokens.issubset(source_tokens):
+            token_direct.append(path)
+    if token_direct:
+        return token_direct, []
 
     nested_leaf = [
         path
