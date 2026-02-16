@@ -76,6 +76,20 @@ Core components:
 - Validator: enforces required fields and output constraints
 - Diagnostics: emits structured transformation report
 
+## Module Relationship Graph
+
+```mermaid
+flowchart LR
+  init["__init__.py"] --> api["api.py"]
+  api --> planner["planner.py"]
+  api --> executor["executor.py"]
+  api --> validator["validator.py"]
+  api --> errors["errors.py"]
+  api --> types["plan_types.py"]
+  planner --> types
+  executor --> types
+```
+
 ## Contracts and Canonical Artifacts
 
 - Backend contracts should be maintained as JSON Schema under `schemas/<provider>/<endpoint>.json`.
@@ -104,24 +118,3 @@ Publishing is automated via GitHub Actions (`.github/workflows/ci-publish.yml`):
 - Push to `main` runs tests and then attempts PyPI publish
 - Publish uses GitHub secret `PYPI_API_TOKEN`
 - Bump `python/pyproject.toml` version before merge to `main` to avoid duplicate version failures
-
-## Repository Map
-
-Primary references in this repository:
-- `openspec/changes/phase-1/design.md`
-- `openspec/changes/phase-1/specs/chat-canonical-transform/spec.md`
-- `openspec/changes/phase-1/specs/provider-availability-routing/spec.md`
-- `openspec/changes/phase-1/specs/adapter-diagnostics-contract/spec.md`
-- `openspec/changes/phase-1/specs/chat-openai-vertical-slice/spec.md`
-
-## Scope and Non-Goals
-
-Current scope:
-- Normalize producer payloads into provider/backend-specific contracts
-- Provide deterministic transform execution and diagnostics
-- Maintain explicit operational policy boundaries
-
-Non-goals:
-- Replacing backend business logic validation rules
-- Defining provider SDK behavior outside payload contract transformation
-- Allowing implicit schema drift through silent passthrough defaults
