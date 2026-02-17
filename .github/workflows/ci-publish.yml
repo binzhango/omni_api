@@ -28,7 +28,7 @@ jobs:
 
       - name: Run tests
         working-directory: python
-        run: uv run pytest -q
+        run: uv run --with dev pytest -q
 
   publish:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
