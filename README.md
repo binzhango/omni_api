@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/binzhango/omni_api/actions/workflows/ci-publish.yml/badge.svg?branch=main)](https://github.com/binzhango/omni_api/actions/workflows/ci-publish.yml)
 [![PyPI version](https://img.shields.io/pypi/v/omni-api.svg)](https://pypi.org/project/omni-api/)
-[![Python versions](https://img.shields.io/pypi/pyversions/omni-api.svg)](https://pypi.org/project/omni-api/)
+[![Python versions](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://pypi.org/project/omni-api/)
 
 `omni_api` is a payload adaptation layer for platform teams that need to enforce backend API contracts while supporting heterogeneous upstream producers.
 Requires Python 3.11+.
