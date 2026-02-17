@@ -1,8 +1,8 @@
 # omni_api
 
 [![CI](https://github.com/binzhango/omni_api/actions/workflows/ci-publish.yml/badge.svg?branch=main)](https://github.com/binzhango/omni_api/actions/workflows/ci-publish.yml)
-[![PyPI version](https://img.shields.io/pypi/v/omni-api.svg)](https://pypi.org/project/omni-api/)
-[![Python versions](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://pypi.org/project/omni-api/)
+[![PyPI version](https://img.shields.io/pypi/v/omni-api-transformer.svg)](https://pypi.org/project/omni-api-transformer/)
+[![Python versions](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://pypi.org/project/omni-api-transformer/)
 
 `omni_api` is a payload adaptation layer for platform teams that need to enforce backend API contracts while supporting heterogeneous upstream producers.
 Requires Python 3.11+.
@@ -10,13 +10,13 @@ Requires Python 3.11+.
 ## Install
 
 ```bash
-pip install omni-api
+pip install omni-api-transformer
 ```
 
 Optional with uv:
 
 ```bash
-uv add omni-api
+uv add omni-api-transformer
 ```
 
 ## Quickstart

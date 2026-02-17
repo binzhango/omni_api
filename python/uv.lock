@@ -35,8 +35,8 @@ wheels = [
 ]
 
 [[package]]
-name = "omni-api"
-version = "0.1.0"
+name = "omni-api-transformer"
+version = "0.1.1"
 source = { editable = "." }
 
 [package.optional-dependencies]
