@@ -5,6 +5,7 @@
 [![Python versions](https://img.shields.io/pypi/pyversions/omni-api.svg)](https://pypi.org/project/omni-api/)
 
 `omni_api` is a payload adaptation layer for platform teams that need to enforce backend API contracts while supporting heterogeneous upstream producers.
+Requires Python 3.11+.
 
 ## Install
 
