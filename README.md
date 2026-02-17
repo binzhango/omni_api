@@ -106,14 +106,6 @@ cd python
 uv run pytest -q
 ```
 
-Run live Ollama integration test (requires local Ollama server/model):
-
-```bash
-cd python
-OLLAMA_MODEL=llama3.1:latest uv run python scripts/run_ollama_integration.py
-RUN_OLLAMA_INTEGRATION=1 OLLAMA_MODEL=llama3.1:latest uv run pytest tests/test_ollama_integration.py -s -vv
-```
-
 Build package artifacts:
 
 ```bash
