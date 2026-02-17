@@ -10,9 +10,6 @@ from omni_api import transform
 
 @pytest.mark.integration
 def test_ollama_llm_alignment_respects_target_schema() -> None:
-    if os.getenv("RUN_OLLAMA_INTEGRATION") != "1":
-        pytest.skip("Set RUN_OLLAMA_INTEGRATION=1 to run Ollama integration test")
-
     source_payload = {
         "user": {
             "full": "John Doe",
@@ -37,7 +34,7 @@ def test_ollama_llm_alignment_respects_target_schema() -> None:
         source_payload,
         target_schema,
         llm_provider="ollama",
-        llm_model=os.getenv("OLLAMA_MODEL", "llama3.1:latest"),
+        llm_model=os.getenv("OLLAMA_MODEL", "nemotron-3-nano:latest"),
         llm_base_url=os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434"),
     )
 
